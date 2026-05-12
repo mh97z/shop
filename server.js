@@ -112,7 +112,7 @@ app.use((err, req, res, next) => {
 });
 
 // ─── تشغيل السيرفر ─────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 6572;
+const PORT = 1112;
 app.listen(PORT, () => {
   console.log(`🚀 السيرفر يعمل على المنفذ ${PORT}`);
   console.log(`🌐 http://localhost:${PORT}`);

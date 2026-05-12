@@ -32,22 +32,6 @@ router.get('/categories', async (req, res) => {
 });
 
 module.exports = router;
-  try {
-    const { q } = req.query;
-    if (!q || q.trim().length < 2) return res.json([]);
-
-    const products = await Product.find({
-      active: true,
-      $or: [
-        { name: { $regex: q, $options: 'i' } },
-        { tags: { $regex: q, $options: 'i' } }
-      ]
-    }).limit(8).select('name slug basePrice images');
-
-    res.json(products);
-  } catch (err) {
-    res.status(500).json([]);
-  }
 });
 
 // جلب الفئات

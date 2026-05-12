@@ -195,9 +195,4 @@ app.use((err, req, res, next) => {
   res.status(500).render('error', { title: 'خطأ في الخادم', error: process.env.NODE_ENV === 'development' ? err.message : 'حدث خطأ داخلي' });
 });
 
-// ─── تشغيل السيرفر ─────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 6572;
-app.listen(PORT, () => {
-  console.log(`🚀 المتجر يعمل على المنفذ ${PORT}`);
-  console.log(`🌐 http://localhost:${PORT}`);
-});
+

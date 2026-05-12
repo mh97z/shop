@@ -121,9 +121,11 @@ app.use((err, req, res, next) => {
 
 // ─── تشغيل السيرفر ─────────────────────────────────────────────────────────
 const PORT = 1112;
-app.listen(PORT, () => {
+const HOST = '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
   console.log(`🚀 السيرفر يعمل على المنفذ ${PORT}`);
-  console.log(`🌐 http://localhost:${PORT}`);
+  console.log(`🌐 http://${HOST}:${PORT}`);
 });
 
 

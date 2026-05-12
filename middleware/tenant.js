@@ -9,6 +9,10 @@
 
 const Tenant = require('../models/Tenant');
 
+function isIpAddress(host) {
+  return /^\d{1,3}(?:\.\d{1,3}){3}$/.test(host) || host === 'localhost';
+}
+
 module.exports = async function resolveTenant(req, res, next) {
   try {
     const host   = req.hostname.toLowerCase();
@@ -40,6 +44,20 @@ module.exports = async function resolveTenant(req, res, next) {
       const platformBase = process.env.PLATFORM_DOMAIN || 'localhost';
       if (host.endsWith(`.${platformBase}`) || host.endsWith('.localhost')) {
         tenant = await Tenant.findOne({ subdomain: parts[0], active: true }).populate('plan').lean();
+      }
+    }
+
+    // ─── الوصول المباشر عبر IP أو localhost: اختر متجرًا افتراضيًا ────────
+    if (!tenant && isIpAddress(host)) {
+      if (process.env.DEFAULT_TENANT_SUBDOMAIN) {
+        tenant = await Tenant.findOne({
+          subdomain: process.env.DEFAULT_TENANT_SUBDOMAIN.toLowerCase(),
+          active: true
+        }).populate('plan').lean();
+      }
+
+      if (!tenant) {
+        tenant = await Tenant.findOne({ active: true }).sort({ createdAt: 1 }).populate('plan').lean();
       }
     }
 

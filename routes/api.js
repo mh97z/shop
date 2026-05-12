@@ -32,16 +32,3 @@ router.get('/categories', async (req, res) => {
 });
 
 module.exports = router;
-});
-
-// جلب الفئات
-router.get('/categories', async (req, res) => {
-  try {
-    const cats = await Category.find({ active: true }).sort({ order: 1 });
-    res.json(cats);
-  } catch (err) {
-    res.status(500).json([]);
-  }
-});
-
-module.exports = router;

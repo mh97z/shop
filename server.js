@@ -49,30 +49,6 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
-
-// ─── الملفات الثابتة مع Cache-Control وETag ───────────────────────────────
-app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge:  process.env.NODE_ENV === 'production' ? '30d' : 0,
-  etag:    true,
-  lastModified: true,
-  setHeaders(res, filePath) {
-    // الصور: كاش شهر كامل
-    if (/\.(jpg|jpeg|png|webp|avif|gif|svg|ico)$/i.test(filePath)) {
-      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
-    }
-    // CSS/JS: كاش أسبوع
-    if (/\.(css|js)$/i.test(filePath)) {
-      res.setHeader('Cache-Control', 'public, max-age=604800');
-    }
-  }
-}));
-
-// ─── المرفوعات (Uploads) مع Cache-Control ────────────────────────────────
-app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads'), {
-  maxAge: '30d',
-  etag: true,
-  setHeaders(res) {
-    res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
   }
 }));
 
@@ -164,13 +140,7 @@ app.use(helmet({
   },
 }));
 
-// حد الطلبات (حماية DDos بسيطة)
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 300,
-  message: 'تجاوزت الحد المسموح به من الطلبات، حاول لاحقاً'
-});
-app.use(limiter);
+
 
 // ─── إعدادات Express ────────────────────────────────────────────────────────
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));

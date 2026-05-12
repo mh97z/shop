@@ -77,11 +77,19 @@ app.use((req, res, next) => {
 
 // ─── متغيرات عامة للقوالب ──────────────────────────────────────────────────
 app.use((req, res, next) => {
-  res.locals.cart      = req.session.cart       || [];
-  res.locals.cartCount = (req.session.cart || []).reduce((s, i) => s + i.qty, 0);
-  res.locals.isAdmin   = req.session.isAdmin    || false;
-  // storeName و primaryColor تأتي من middleware المتجر
-  if (!res.locals.storeName) res.locals.storeName = process.env.PLATFORM_NAME || 'Platform';
+  res.locals.tenant            = res.locals.tenant || null;
+  res.locals.cart              = req.session.cart || [];
+  res.locals.cartCount         = (req.session.cart || []).reduce((s, i) => s + i.qty, 0);
+  res.locals.isAdmin           = req.session.isAdmin || false;
+  res.locals.storeName         = res.locals.storeName || process.env.PLATFORM_NAME || 'Platform';
+  res.locals.primaryColor      = res.locals.primaryColor || '#EC4899';
+  res.locals.currency          = res.locals.currency || 'د.ع';
+  res.locals.instagram         = res.locals.instagram || '#';
+  res.locals.tiktok            = res.locals.tiktok || '#';
+  res.locals.telegram          = res.locals.telegram || '#';
+  res.locals.facebook          = res.locals.facebook || '#';
+  res.locals.whatsapp          = res.locals.whatsapp || '';
+  res.locals.poweredByVisible  = typeof res.locals.poweredByVisible === 'boolean' ? res.locals.poweredByVisible : true;
   next();
 });
 

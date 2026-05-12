@@ -61,6 +61,20 @@ module.exports = async function resolveTenant(req, res, next) {
       }
     }
 
+    // ─── مسارات إدارة المتجر عبر IP: اسمح بالدخول باستخدام متجر افتراضي ──
+    if (!tenant && req.path.startsWith('/admin')) {
+      if (process.env.DEFAULT_TENANT_SUBDOMAIN) {
+        tenant = await Tenant.findOne({
+          subdomain: process.env.DEFAULT_TENANT_SUBDOMAIN.toLowerCase(),
+          active: true
+        }).populate('plan').lean();
+      }
+
+      if (!tenant) {
+        tenant = await Tenant.findOne({ active: true }).sort({ createdAt: 1 }).populate('plan').lean();
+      }
+    }
+
     // ─── بيئة التطوير: استخدام أول متجر متاح تلقائياً ──────────────────
     if (!tenant && process.env.NODE_ENV !== 'production') {
       tenant = await Tenant.findOne({ active: true }).populate('plan').lean();

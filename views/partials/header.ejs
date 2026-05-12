@@ -1,17 +1,28 @@
+<%
+  const safeTenant = typeof tenant !== 'undefined' ? tenant : null;
+  const safeTitle = typeof title !== 'undefined' ? title : 'Platform';
+  const safeStoreName = typeof storeName !== 'undefined' ? storeName : 'Platform';
+  const safePrimaryColor = typeof primaryColor !== 'undefined' ? primaryColor : '#EC4899';
+  const safeCartCount = typeof cartCount !== 'undefined' ? cartCount : 0;
+  const safeIsAdmin = typeof isAdmin !== 'undefined' ? isAdmin : false;
+  const safeInstagram = typeof instagram !== 'undefined' ? instagram : '#';
+  const safeTiktok = typeof tiktok !== 'undefined' ? tiktok : '#';
+  const safeFacebook = typeof facebook !== 'undefined' ? facebook : '#';
+%>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= title %> | <%= storeName %></title>
-  <meta name="description" content="<%= storeName %> - تسوق الآن بأفضل الأسعار" />
+  <title><%= safeTitle %> | <%= safeStoreName %></title>
+  <meta name="description" content="<%= safeStoreName %> - تسوق الآن بأفضل الأسعار" />
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          colors: { primary: '<%= primaryColor || "#EC4899" %>' },
+          colors: { primary: '<%= safePrimaryColor %>' },
           fontFamily: { cairo: ['Cairo', 'sans-serif'] }
         }
       }
@@ -34,10 +45,10 @@
       <!-- Right: Logo + Name -->
       <div class="flex items-center gap-2">
         <a href="/" class="flex items-center gap-2">
-          <% if (tenant && tenant.logo) { %>
-          <img src="<%= tenant.logo %>" alt="<%= storeName %>" class="h-10 w-10 object-contain rounded-full" loading="lazy" />
+          <% if (safeTenant && safeTenant.logo) { %>
+          <img src="<%= safeTenant.logo %>" alt="<%= safeStoreName %>" class="h-10 w-10 object-contain rounded-full" loading="lazy" />
           <% } %>
-          <span class="text-lg font-bold text-gray-800"><%= storeName %></span>
+          <span class="text-lg font-bold text-gray-800"><%= safeStoreName %></span>
         </a>
       </div>
 
@@ -46,7 +57,7 @@
         <!-- Cart -->
         <a href="/cart" class="relative p-1">
           <i class="fas fa-cart-plus text-2xl text-gray-700"></i>
-          <span id="cartBadge" class="<%= cartCount > 0 ? '' : 'hidden' %> absolute -top-1 -right-1 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold leading-none"><%= cartCount %></span>
+          <span id="cartBadge" class="<%= safeCartCount > 0 ? '' : 'hidden' %> absolute -top-1 -right-1 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold leading-none"><%= safeCartCount %></span>
         </a>
         <!-- Hamburger -->
         <button id="mobileMenuBtn" class="p-1" aria-label="القائمة">
@@ -79,10 +90,10 @@
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b">
       <div class="flex items-center gap-2">
-        <% if (tenant && tenant.logo) { %>
-        <img src="<%= tenant.logo %>" class="h-9 w-9 object-contain rounded-full" loading="lazy" />
+        <% if (safeTenant && safeTenant.logo) { %>
+        <img src="<%= safeTenant.logo %>" class="h-9 w-9 object-contain rounded-full" loading="lazy" />
         <% } %>
-        <span class="font-bold text-gray-800"><%= storeName %></span>
+        <span class="font-bold text-gray-800"><%= safeStoreName %></span>
       </div>
       <button id="closeMenu"><i class="fas fa-times text-xl text-gray-500"></i></button>
     </div>
@@ -100,7 +111,7 @@
         <a href="/cart" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 font-medium">
           <i class="fas fa-shopping-cart text-pink-400 w-5"></i> السلة
         </a>
-        <% if (isAdmin) { %>
+        <% if (safeIsAdmin) { %>
         <a href="/admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 font-medium">
           <i class="fas fa-cog text-pink-400 w-5"></i> لوحة التحكم
         </a>
@@ -109,9 +120,9 @@
     </div>
     <!-- Social -->
     <div class="p-4 border-t flex gap-3">
-      <% if (instagram && instagram !== '#') { %><a href="<%= instagram %>" target="_blank" rel="noopener" class="text-gray-400 hover:text-pink-500"><i class="fab fa-instagram text-xl"></i></a><% } %>
-      <% if (tiktok && tiktok !== '#') { %><a href="<%= tiktok %>" target="_blank" rel="noopener" class="text-gray-400 hover:text-gray-700"><i class="fab fa-tiktok text-xl"></i></a><% } %>
-      <% if (facebook && facebook !== '#') { %><a href="<%= facebook %>" target="_blank" rel="noopener" class="text-gray-400 hover:text-blue-600"><i class="fab fa-facebook text-xl"></i></a><% } %>
+      <% if (safeInstagram && safeInstagram !== '#') { %><a href="<%= safeInstagram %>" target="_blank" rel="noopener" class="text-gray-400 hover:text-pink-500"><i class="fab fa-instagram text-xl"></i></a><% } %>
+      <% if (safeTiktok && safeTiktok !== '#') { %><a href="<%= safeTiktok %>" target="_blank" rel="noopener" class="text-gray-400 hover:text-gray-700"><i class="fab fa-tiktok text-xl"></i></a><% } %>
+      <% if (safeFacebook && safeFacebook !== '#') { %><a href="<%= safeFacebook %>" target="_blank" rel="noopener" class="text-gray-400 hover:text-blue-600"><i class="fab fa-facebook text-xl"></i></a><% } %>
     </div>
   </div>
 </div>

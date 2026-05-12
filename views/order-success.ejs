@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+
+<div class="max-w-lg mx-auto px-4 py-10 text-center min-h-screen" dir="rtl">
+
+  <!-- علامة النجاح -->
+  <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
+    <i class="fas fa-check text-green-500 text-4xl"></i>
+  </div>
+
+  <h1 class="text-xl font-bold text-gray-900 mb-2">تم استلام طلبك!</h1>
+  <p class="text-gray-500 text-sm mb-1">رقم الطلب:
+    <span class="font-bold text-gray-700">#<%= order.orderNumber %></span>
+  </p>
+  <p class="text-gray-400 text-xs mb-6">سيتم التواصل معك قريباً لتأكيد طلبك وتحديد موعد التوصيل</p>
+
+  <!-- ملخص الطلب -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-right mb-5">
+    <h3 class="text-sm font-bold text-gray-700 mb-3 border-b pb-2">تفاصيل الطلب</h3>
+    <% order.items.forEach(item => { %>
+    <div class="flex justify-between items-center text-sm py-1.5 border-b border-gray-50">
+      <span class="text-gray-700 font-medium"><%= item.name %></span>
+      <span class="text-gray-500 text-xs"><%= item.qty %> × <%= item.price.toLocaleString('ar-IQ') %></span>
+    </div>
+    <% }) %>
+    <div class="flex justify-between items-center pt-3 font-bold">
+      <span class="text-gray-800">الإجمالي</span>
+      <span class="text-pink-500 text-base"><%= order.total.toLocaleString('ar-IQ') %> <%= currency %></span>
+    </div>
+    <div class="mt-2 pt-2 border-t text-xs text-gray-400 flex gap-4">
+      <span><i class="fas fa-user ml-1"></i><%= order.customer?.name %></span>
+      <span><i class="fas fa-phone ml-1"></i><%= order.customer?.phone %></span>
+    </div>
+  </div>
+
+  <!-- أزرار التواصل -->
+  <div class="flex flex-col gap-3 mb-6">
+    <% if (tenant && tenant.whatsapp && waMsg) { %>
+    <a href="https://wa.me/<%= tenant.whatsapp %>?text=<%= encodeURIComponent(waMsg) %>"
+       target="_blank" rel="noopener noreferrer"
+       class="flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 rounded-2xl transition shadow-sm">
+      <i class="fab fa-whatsapp text-xl"></i>
+      تأكيد الطلب عبر واتساب
+    </a>
+    <% } %>
+    <% if (tenant && tenant.telegram) { %>
+    <a href="<%= tenant.telegram %>" target="_blank" rel="noopener noreferrer"
+       class="flex items-center justify-center gap-3 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3.5 rounded-2xl transition shadow-sm">
+      <i class="fab fa-telegram text-xl"></i>
+      التواصل عبر تيليغرام
+    </a>
+    <% } %>
+  </div>
+
+  <a href="/" class="text-sm text-pink-500 hover:text-pink-600 font-semibold">
+    <i class="fas fa-home ml-1"></i>
+    العودة للرئيسية
+  </a>
+
+</div>
+
+<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-sm px-5 py-2.5 rounded-full shadow-xl z-50 transition-opacity"></div>
+<%- include('partials/footer') %>

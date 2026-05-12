@@ -1,0 +1,149 @@
+<%- include('partials/admin-header') %>
+
+<div class="max-w-3xl">
+  <% if (error) { %>
+  <div class="bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-5 border border-red-100 text-sm">
+    <i class="fas fa-exclamation-circle ml-1"></i> <%= error %>
+  </div>
+  <% } %>
+
+  <form method="POST"
+        action="<%= product ? '/admin/products/' + product._id + '?_method=PUT' : '/admin/products' %>"
+        enctype="multipart/form-data"
+        class="bg-white rounded-2xl shadow-sm p-6 space-y-5">
+
+    <!-- Name -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">اسم المنتج *</label>
+      <input type="text" name="name" required value="<%= product ? product.name : '' %>"
+             class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-amber-400 text-sm" />
+    </div>
+
+    <!-- Description -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">تفاصيل المنتج</label>
+      <textarea name="description" rows="3"
+                class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-amber-400 text-sm resize-none"><%= product ? product.description : '' %></textarea>
+    </div>
+
+    <!-- Base Price & Category -->
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">السعر الأساسي (د.ع) *</label>
+        <input type="number" name="basePrice" required min="0" value="<%= product ? product.basePrice : '' %>"
+               class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-amber-400 text-sm" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الفئة</label>
+        <select name="category" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-amber-400 text-sm bg-white">
+          <option value="">-- بدون فئة --</option>
+          <% categories.forEach(cat => { %>
+          <option value="<%= cat._id %>" <%= product && product.category && product.category.toString() === cat._id.toString() ? 'selected' : '' %>>
+            <%= cat.name %>
+          </option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <!-- Sizes -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">الأحجام والأسعار</label>
+      <div id="sizesContainer" class="space-y-2">
+        <% const sizes = product && product.sizes.length > 0 ? product.sizes : [{ label: '', price: '' }]; %>
+        <% sizes.forEach((s, i) => { %>
+        <div class="flex gap-2 items-center size-row">
+          <input type="text" name="sizes[label]" placeholder="الحجم مثل: 10 مل" value="<%= s.label %>"
+                 class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-400" />
+          <input type="number" name="sizes[price]" placeholder="السعر" value="<%= s.price %>" min="0"
+                 class="w-32 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-400" />
+          <button type="button" onclick="this.closest('.size-row').remove()" class="text-red-400 hover:text-red-600 p-1">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <% }) %>
+      </div>
+      <button type="button" onclick="addSizeRow()"
+              class="mt-2 text-sm text-amber-600 hover:text-amber-700 flex items-center gap-1">
+        <i class="fas fa-plus text-xs"></i> إضافة حجم
+      </button>
+    </div>
+
+    <!-- Tags -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">الوسوم (مفصولة بفاصلة)</label>
+      <input type="text" name="tags" placeholder="نوادر, جديد, خصم"
+             value="<%= product ? product.tags.join(', ') : '' %>"
+             class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-amber-400 text-sm" />
+    </div>
+
+    <!-- Images -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">صور المنتج</label>
+      <!-- Existing images -->
+      <% if (product && product.images.length > 0) { %>
+      <div class="flex gap-2 flex-wrap mb-3" id="existingImgs">
+        <% product.images.forEach((img, i) => { %>
+        <div class="relative group">
+          <img src="<%= img %>" class="w-20 h-20 rounded-xl object-cover border" onerror="this.parentElement.remove()" />
+          <input type="hidden" name="existingImages" value="<%= img %>" />
+          <button type="button" onclick="removeImg(this)" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 text-xs hidden group-hover:flex items-center justify-center">×</button>
+        </div>
+        <% }) %>
+      </div>
+      <% } %>
+      <input type="file" name="images" multiple accept="image/*" id="imgInput"
+             class="block w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer" />
+      <p class="text-xs text-gray-400 mt-1">يمكن اختيار حتى 6 صور (JPG, PNG, WebP) بحد أقصى 5MB لكل صورة</p>
+    </div>
+
+    <!-- Toggles -->
+    <div class="flex gap-6">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="featured" class="w-4 h-4 accent-amber-600 rounded"
+               <%= product && product.featured ? 'checked' : '' %> />
+        <span class="text-sm font-medium text-gray-700">مميز (يظهر في السلايدر)</span>
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="active" class="w-4 h-4 accent-amber-600 rounded"
+               <%= !product || product.active ? 'checked' : '' %> />
+        <span class="text-sm font-medium text-gray-700">نشط (يظهر للزوار)</span>
+      </label>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 pt-3 border-t">
+      <button type="submit"
+              class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-8 py-3 rounded-xl transition-colors shadow-sm">
+        <i class="fas fa-save ml-1"></i> حفظ المنتج
+      </button>
+      <a href="/admin/products"
+         class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-6 py-3 rounded-xl transition-colors">
+        إلغاء
+      </a>
+    </div>
+  </form>
+</div>
+
+<script>
+  function addSizeRow() {
+    const c = document.getElementById('sizesContainer');
+    const row = document.createElement('div');
+    row.className = 'flex gap-2 items-center size-row';
+    row.innerHTML = `
+      <input type="text" name="sizes[label]" placeholder="الحجم مثل: 10 مل"
+             class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-400" />
+      <input type="number" name="sizes[price]" placeholder="السعر" min="0"
+             class="w-32 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-400" />
+      <button type="button" onclick="this.closest('.size-row').remove()" class="text-red-400 hover:text-red-600 p-1">
+        <i class="fas fa-times"></i>
+      </button>`;
+    c.appendChild(row);
+  }
+
+  function removeImg(btn) {
+    btn.closest('div').remove();
+  }
+</script>
+
+<%- include('partials/admin-footer') %>

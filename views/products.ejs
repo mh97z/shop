@@ -1,0 +1,167 @@
+<%- include('partials/header') %>
+
+<!-- ─── صفحة المنتجات ──────────────────────────────────────────────────── -->
+<section class="px-4 py-4">
+  <!-- Page Title -->
+  <div class="flex items-center justify-between mb-3">
+    <h1 class="text-base font-bold text-gray-800">
+      المنتجات <span class="text-sm text-gray-400 font-normal">(<%= total %>)</span>
+    </h1>
+  </div>
+
+  <!-- Category Pills (horizontal scroll with images) -->
+  <% if (categories.length > 0) { %>
+  <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2 mb-4">
+    <a href="/products"
+       class="flex-none flex flex-col items-center gap-1 min-w-[60px]">
+      <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center border-2 <%= !currentCat ? 'border-pink-500' : 'border-transparent' %>">
+        <i class="fas fa-th-large text-pink-500 text-sm"></i>
+      </div>
+      <span class="text-xs text-gray-600 whitespace-nowrap font-medium <%= !currentCat ? 'text-pink-600' : '' %>">الكل</span>
+    </a>
+    <% categories.forEach(cat => { %>
+    <a href="/products?cat=<%= cat._id %>"
+       class="flex-none flex flex-col items-center gap-1 min-w-[60px]">
+      <div class="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 <%= currentCat === cat._id.toString() ? 'border-pink-500' : 'border-transparent' %>">
+        <% if (cat.image) { %>
+        <img src="<%= cat.image %>" alt="<%= cat.name %>" class="w-full h-full object-cover" loading="lazy" />
+        <% } else { %>
+        <div class="w-full h-full flex items-center justify-center bg-pink-50">
+          <i class="fas fa-tag text-pink-300 text-sm"></i>
+        </div>
+        <% } %>
+      </div>
+      <span class="text-xs text-gray-600 whitespace-nowrap font-medium line-clamp-1 <%= currentCat === cat._id.toString() ? 'text-pink-600' : '' %>"><%= cat.name %></span>
+    </a>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <!-- Search active message -->
+  <% if (searchQuery) { %>
+  <div class="mb-3 flex items-center justify-between text-sm text-gray-500">
+    <span>نتائج البحث عن "<strong class="text-gray-800"><%= searchQuery %></strong>"</span>
+    <a href="/products" class="text-pink-500 text-xs">مسح البحث</a>
+  </div>
+  <% } %>
+
+  <!-- Products Grid -->
+  <% if (products.length > 0) { %>
+  <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+    <% products.forEach(p => { %>
+    <%- include('partials/product-card', { product: p }) %>
+    <% }) %>
+  </div>
+
+  <!-- Pagination -->
+  <% if (totalPages > 1) { %>
+  <div class="flex justify-center gap-2 mt-6 flex-wrap">
+    <% for(let i = 1; i <= totalPages; i++) { %>
+    <a href="/products?page=<%= i %><%= currentCat ? '&cat='+currentCat : '' %><%= searchQuery ? '&q='+encodeURIComponent(searchQuery) : '' %>"
+       class="w-9 h-9 flex items-center justify-center rounded-full text-sm font-semibold transition-colors
+              <%= i === currentPage ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-pink-50' %>">
+      <%= i %>
+    </a>
+    <% } %>
+  </div>
+  <% } %>
+
+  <% if (currentPage === totalPages) { %>
+  <p class="text-center text-sm text-gray-400 mt-4">لقد شاهدت جميع المنتجات <%= total %>.</p>
+  <% } %>
+
+  <% } else { %>
+  <div class="text-center py-16 text-gray-400">
+    <i class="fas fa-search text-4xl mb-3 block"></i>
+    <p class="text-sm">لا توجد منتجات مطابقة</p>
+    <a href="/products" class="mt-3 inline-block text-pink-500 text-sm font-medium">عرض الكل</a>
+  </div>
+  <% } %>
+</section>
+
+<%- include('partials/footer') %>
+
+  <!-- Header -->
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">المنتجات <span class="text-base text-gray-400 font-normal">(<%= total %>)</span></h1>
+    <!-- Search -->
+    <form method="GET" action="/products" class="flex gap-2">
+      <input type="text" name="q" value="<%= searchQuery %>" placeholder="ابحث..."
+             class="border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-amber-400 w-52" />
+      <% if (currentCat) { %><input type="hidden" name="cat" value="<%= currentCat %>" /><% } %>
+      <button class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700 transition-colors">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
+  </div>
+
+  <div class="flex gap-6">
+    <!-- Sidebar Filters (desktop) -->
+    <aside class="hidden md:block w-52 flex-none">
+      <div class="bg-white rounded-2xl shadow-sm p-4">
+        <h3 class="font-semibold text-gray-700 mb-3 text-sm">الفئات</h3>
+        <ul class="space-y-1">
+          <li>
+            <a href="/products<%= searchQuery ? '?q='+searchQuery : '' %>"
+               class="block px-3 py-2 rounded-lg text-sm transition-colors <%= !currentCat ? 'bg-amber-600 text-white' : 'hover:bg-amber-50 text-gray-600' %>">
+              الكل
+            </a>
+          </li>
+          <% categories.forEach(cat => { %>
+          <li>
+            <a href="/products?cat=<%= cat._id %><%= searchQuery ? '&q='+searchQuery : '' %>"
+               class="block px-3 py-2 rounded-lg text-sm transition-colors <%= currentCat === cat._id.toString() ? 'bg-amber-600 text-white' : 'hover:bg-amber-50 text-gray-600' %>">
+              <%= cat.name %>
+            </a>
+          </li>
+          <% }) %>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Products -->
+    <div class="flex-1">
+      <!-- Mobile category pills -->
+      <% if (categories.length > 0) { %>
+      <div class="flex gap-2 overflow-x-auto pb-3 mb-4 md:hidden scrollbar-hide">
+        <a href="/products" class="flex-none px-4 py-1.5 rounded-full text-sm border <%= !currentCat ? 'bg-amber-600 text-white border-amber-600' : 'bg-white border-gray-200' %>">الكل</a>
+        <% categories.forEach(cat => { %>
+        <a href="/products?cat=<%= cat._id %>" class="flex-none px-4 py-1.5 rounded-full text-sm border <%= currentCat === cat._id.toString() ? 'bg-amber-600 text-white border-amber-600' : 'bg-white border-gray-200' %>">
+          <%= cat.name %>
+        </a>
+        <% }) %>
+      </div>
+      <% } %>
+
+      <% if (products.length > 0) { %>
+      <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <% products.forEach(p => { %>
+        <%- include('partials/product-card', { product: p }) %>
+        <% }) %>
+      </div>
+
+      <!-- Pagination -->
+      <% if (totalPages > 1) { %>
+      <div class="flex justify-center gap-2 mt-10">
+        <% for(let i = 1; i <= totalPages; i++) { %>
+        <a href="/products?page=<%= i %><%= currentCat ? '&cat='+currentCat : '' %><%= searchQuery ? '&q='+searchQuery : '' %>"
+           class="w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium transition-colors
+                  <%= i === currentPage ? 'bg-amber-600 text-white' : 'bg-white text-gray-600 hover:bg-amber-50 border border-gray-200' %>">
+          <%= i %>
+        </a>
+        <% } %>
+      </div>
+      <% } %>
+
+      <% } else { %>
+      <div class="text-center py-20 text-gray-400">
+        <i class="fas fa-search text-5xl mb-4 block"></i>
+        <p class="text-lg">لا توجد منتجات مطابقة</p>
+        <a href="/products" class="mt-4 inline-block text-amber-600 hover:underline text-sm">عرض جميع المنتجات</a>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

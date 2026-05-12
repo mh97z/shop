@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %> | <%= storeName %></title>
+  <meta name="description" content="<%= storeName %> - تسوق الآن بأفضل الأسعار" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primary: '<%= primaryColor || "#EC4899" %>' },
+          fontFamily: { cairo: ['Cairo', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-white font-cairo text-gray-900 min-h-screen flex flex-col">
+
+<!-- ─── Header ─────────────────────────────────────────────────────────── -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="px-4 py-3">
+    <!-- Row 1: Menu | Logo+Name | Cart -->
+    <div class="flex items-center justify-between">
+      <!-- Right: Logo + Name -->
+      <div class="flex items-center gap-2">
+        <a href="/" class="flex items-center gap-2">
+          <% if (tenant && tenant.logo) { %>
+          <img src="<%= tenant.logo %>" alt="<%= storeName %>" class="h-10 w-10 object-contain rounded-full" loading="lazy" />
+          <% } %>
+          <span class="text-lg font-bold text-gray-800"><%= storeName %></span>
+        </a>
+      </div>
+
+      <!-- Left: Cart + Menu -->
+      <div class="flex items-center gap-3">
+        <!-- Cart -->
+        <a href="/cart" class="relative p-1">
+          <i class="fas fa-cart-plus text-2xl text-gray-700"></i>
+          <span id="cartBadge" class="<%= cartCount > 0 ? '' : 'hidden' %> absolute -top-1 -right-1 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold leading-none"><%= cartCount %></span>
+        </a>
+        <!-- Hamburger -->
+        <button id="mobileMenuBtn" class="p-1" aria-label="القائمة">
+          <i class="fas fa-bars text-2xl text-gray-700" id="menuIcon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Row 2: Search -->
+    <div class="mt-3 relative">
+      <input type="text" id="searchInput" placeholder="ابحث عن منتجات..."
+        class="w-full border border-gray-200 rounded-full py-2.5 px-5 pl-11 text-sm focus:outline-none focus:border-pink-400 bg-gray-50 placeholder-gray-400" />
+      <button class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+        <i class="fas fa-search text-base"></i>
+      </button>
+      <div id="searchResults" class="hidden absolute top-full mt-1 w-full bg-white shadow-xl rounded-2xl border border-gray-100 z-50 max-h-72 overflow-y-auto"></div>
+    </div>
+
+    <!-- Row 3: Categories scroll -->
+    <div id="catRow" class="mt-3 flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+      <!-- تُملأ من JavaScript -->
+    </div>
+  </div>
+</header>
+
+<!-- ─── Mobile Sidebar Menu ────────────────────────────────────────────── -->
+<div id="mobileMenu" class="hidden fixed inset-0 z-50">
+  <div class="absolute inset-0 bg-black/40" id="menuOverlay"></div>
+  <div class="absolute top-0 right-0 w-72 h-full bg-white shadow-2xl flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b">
+      <div class="flex items-center gap-2">
+        <% if (tenant && tenant.logo) { %>
+        <img src="<%= tenant.logo %>" class="h-9 w-9 object-contain rounded-full" loading="lazy" />
+        <% } %>
+        <span class="font-bold text-gray-800"><%= storeName %></span>
+      </div>
+      <button id="closeMenu"><i class="fas fa-times text-xl text-gray-500"></i></button>
+    </div>
+    <!-- الفئات -->
+    <div class="p-4 flex-1 overflow-y-auto">
+      <p class="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">الفئات</p>
+      <div id="sidebarCats" class="space-y-1"><!-- تُملأ من JS --></div>
+      <div class="mt-6 space-y-1">
+        <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 font-medium">
+          <i class="fas fa-home text-pink-400 w-5"></i> الرئيسية
+        </a>
+        <a href="/products" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 font-medium">
+          <i class="fas fa-th-large text-pink-400 w-5"></i> جميع المنتجات
+        </a>
+        <a href="/cart" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 font-medium">
+          <i class="fas fa-shopping-cart text-pink-400 w-5"></i> السلة
+        </a>
+        <% if (isAdmin) { %>
+        <a href="/admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 font-medium">
+          <i class="fas fa-cog text-pink-400 w-5"></i> لوحة التحكم
+        </a>
+        <% } %>
+      </div>
+    </div>
+    <!-- Social -->
+    <div class="p-4 border-t flex gap-3">
+      <% if (instagram && instagram !== '#') { %><a href="<%= instagram %>" target="_blank" rel="noopener" class="text-gray-400 hover:text-pink-500"><i class="fab fa-instagram text-xl"></i></a><% } %>
+      <% if (tiktok && tiktok !== '#') { %><a href="<%= tiktok %>" target="_blank" rel="noopener" class="text-gray-400 hover:text-gray-700"><i class="fab fa-tiktok text-xl"></i></a><% } %>
+      <% if (facebook && facebook !== '#') { %><a href="<%= facebook %>" target="_blank" rel="noopener" class="text-gray-400 hover:text-blue-600"><i class="fab fa-facebook text-xl"></i></a><% } %>
+    </div>
+  </div>
+</div>
+
+<main class="flex-1">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Google Fonts Arabic -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-[#faf8f5] font-cairo text-gray-800 min-h-screen flex flex-col">
+
+<!-- ─── Header ─────────────────────────────────────────────────────── -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4">
+    <!-- Top bar -->
+    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2">
+        <img src="/img/logo.png" alt="<%= storeName %>" class="h-12 object-contain" onerror="this.style.display='none'" />
+        <span class="text-2xl font-extrabold text-amber-800 tracking-wide">ETR</span>
+      </a>
+
+      <!-- Search bar -->
+      <div class="flex-1 max-w-lg mx-4 relative">
+        <input type="text" id="searchInput" placeholder="ابحث عن عطر..."
+          class="w-full border border-gray-200 rounded-full py-2 px-5 pr-10 text-sm focus:outline-none focus:border-amber-400 bg-gray-50" />
+        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+        <!-- نتائج البحث -->
+        <div id="searchResults" class="absolute top-full mt-1 w-full bg-white shadow-xl rounded-xl border border-gray-100 z-50 hidden max-h-80 overflow-y-auto"></div>
+      </div>
+
+      <!-- Icons -->
+      <div class="flex items-center gap-4">
+        <a href="/cart" class="relative p-2 hover:text-amber-700 transition-colors">
+          <i class="fas fa-shopping-bag text-xl"></i>
+          <% if (cartCount > 0) { %>
+          <span class="absolute -top-1 -left-1 bg-amber-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold" id="cartBadge"><%= cartCount %></span>
+          <% } else { %>
+          <span class="absolute -top-1 -left-1 bg-amber-600 text-white text-xs rounded-full w-5 h-5 items-center justify-center font-bold hidden" id="cartBadge">0</span>
+          <% } %>
+        </a>
+        <% if (isAdmin) { %>
+        <a href="/admin" class="text-sm text-amber-700 hover:underline"><i class="fas fa-cog"></i> الإدارة</a>
+        <% } %>
+        <!-- Mobile menu -->
+        <button id="mobileMenuBtn" class="md:hidden p-2">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Nav categories (desktop) -->
+    <nav class="hidden md:flex items-center gap-1 py-2 overflow-x-auto" id="navCategories">
+      <a href="/products" class="nav-cat-link px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap hover:bg-amber-50 hover:text-amber-700 transition-all <%= (typeof currentCat !== 'undefined' && !currentCat) ? 'active' : '' %>">الكل</a>
+      <!-- يتم تحميل الفئات بـ JS -->
+    </nav>
+
+    <!-- Mobile search (hidden by default) -->
+    <div id="mobileMenu" class="hidden md:hidden py-3 border-t">
+      <a href="/products" class="block py-2 px-4 hover:bg-amber-50 rounded-lg">جميع المنتجات</a>
+      <a href="/cart" class="block py-2 px-4 hover:bg-amber-50 rounded-lg">سلة التسوق</a>
+    </div>
+  </div>
+</header>
+
+<!-- ─── Main Content ──────────────────────────────────────────────── -->
+<main class="flex-1">

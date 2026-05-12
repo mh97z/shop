@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %> | لوحة التحكم</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>body { font-family: 'Cairo', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen flex">
+
+<!-- Sidebar -->
+<aside class="w-60 bg-gray-900 text-white flex-none min-h-screen flex flex-col">
+  <div class="p-5 border-b border-gray-700">
+    <div class="text-base font-bold text-white"><%= storeName || 'لوحة التحكم' %></div>
+    <p class="text-xs text-gray-400 mt-0.5">إدارة المتجر</p>
+  </div>
+  <nav class="flex-1 p-3 space-y-0.5">
+    <a href="/admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors <%= title === 'لوحة التحكم' ? 'bg-pink-600 text-white' : 'text-gray-300 hover:bg-gray-800' %>">
+      <i class="fas fa-home w-5 text-center text-sm"></i> الرئيسية
+    </a>
+    <a href="/admin/products" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors <%= ['المنتجات','منتج جديد','تعديل المنتج'].includes(title) ? 'bg-pink-600 text-white' : 'text-gray-300 hover:bg-gray-800' %>">
+      <i class="fas fa-box w-5 text-center text-sm"></i> المنتجات
+    </a>
+    <a href="/admin/categories" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors <%= title === 'الفئات' ? 'bg-pink-600 text-white' : 'text-gray-300 hover:bg-gray-800' %>">
+      <i class="fas fa-tags w-5 text-center text-sm"></i> الفئات
+    </a>
+    <a href="/admin/orders" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors <%= ['الطلبات','تفاصيل الطلب'].includes(title) ? 'bg-pink-600 text-white' : 'text-gray-300 hover:bg-gray-800' %>">
+      <i class="fas fa-clipboard-list w-5 text-center text-sm"></i> الطلبات
+    </a>
+    <a href="/admin/subscription" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors <%= title === 'الاشتراك' ? 'bg-pink-600 text-white' : 'text-gray-300 hover:bg-gray-800' %>">
+      <i class="fas fa-crown w-5 text-center text-sm"></i> الاشتراك
+    </a>
+    <a href="/admin/settings" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors <%= title === 'الإعدادات' ? 'bg-pink-600 text-white' : 'text-gray-300 hover:bg-gray-800' %>">
+      <i class="fas fa-cog w-5 text-center text-sm"></i> الإعدادات
+    </a>
+    <a href="/" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:bg-gray-800 transition-colors">
+      <i class="fas fa-external-link-alt w-5 text-center text-sm"></i> المتجر
+    </a>
+  </nav>
+  <div class="p-4 border-t border-gray-700">
+    <form method="POST" action="/admin/logout">
+      <button class="flex items-center gap-2 text-sm text-gray-400 hover:text-red-400 transition-colors w-full">
+        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+      </button>
+    </form>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="flex-1 flex flex-col min-h-screen overflow-x-auto">
+  <header class="bg-white shadow-sm px-6 py-3.5 flex items-center justify-between sticky top-0 z-10">
+    <h1 class="text-base font-bold text-gray-800"><%= title %></h1>
+    <a href="/" target="_blank" class="text-xs text-gray-400 hover:text-pink-500 flex items-center gap-1">
+      <i class="fas fa-store text-xs"></i> المتجر
+    </a>
+  </header>
+  <main class="flex-1 p-6">
+
+
+<!-- Sidebar -->
+<aside class="w-64 bg-gray-900 text-white flex-none min-h-screen flex flex-col">
+  <div class="p-5 border-b border-gray-700">
+    <div class="text-2xl font-extrabold text-amber-400">ETR Admin</div>
+    <p class="text-xs text-gray-400 mt-0.5">لوحة التحكم</p>
+  </div>
+  <nav class="flex-1 p-4 space-y-1">
+    <a href="/admin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors <%= title === 'لوحة التحكم' ? 'bg-amber-600' : '' %>">
+      <i class="fas fa-home w-5 text-center"></i> الرئيسية
+    </a>
+    <a href="/admin/products" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors <%= title === 'المنتجات' || title === 'منتج جديد' || title === 'تعديل المنتج' ? 'bg-amber-600' : '' %>">
+      <i class="fas fa-box w-5 text-center"></i> المنتجات
+    </a>
+    <a href="/admin/categories" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors <%= title === 'الفئات' ? 'bg-amber-600' : '' %>">
+      <i class="fas fa-tags w-5 text-center"></i> الفئات
+    </a>
+    <a href="/admin/orders" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors <%= title === 'الطلبات' || title === 'تفاصيل الطلب' ? 'bg-amber-600' : '' %>">
+      <i class="fas fa-clipboard-list w-5 text-center"></i> الطلبات
+    </a>
+    <a href="/" target="_blank" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors text-gray-400">
+      <i class="fas fa-external-link-alt w-5 text-center"></i> المتجر
+    </a>
+  </nav>
+  <div class="p-4 border-t border-gray-700">
+    <form method="POST" action="/admin/logout">
+      <button class="flex items-center gap-2 text-sm text-gray-400 hover:text-red-400 transition-colors w-full">
+        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+      </button>
+    </form>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="flex-1 flex flex-col min-h-screen overflow-x-auto">
+  <header class="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
+    <h1 class="text-lg font-bold text-gray-800"><%= title %></h1>
+  </header>
+  <main class="flex-1 p-6">

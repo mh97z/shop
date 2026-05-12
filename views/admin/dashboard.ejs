@@ -1,0 +1,82 @@
+<%- include('partials/admin-header') %>
+
+<!-- Stats -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+  <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4">
+    <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
+      <i class="fas fa-box text-pink-500 text-xl"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-extrabold text-gray-800"><%= prodCount %></div>
+      <div class="text-sm text-gray-400">إجمالي المنتجات</div>
+    </div>
+  </div>
+  <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4">
+    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+      <i class="fas fa-shopping-bag text-blue-600 text-xl"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-extrabold text-gray-800"><%= orderCount %></div>
+      <div class="text-sm text-gray-400">إجمالي الطلبات</div>
+    </div>
+  </div>
+  <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4">
+    <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+      <i class="fas fa-clock text-yellow-500 text-xl"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-extrabold text-gray-800"><%= pendingCount %></div>
+      <div class="text-sm text-gray-400">طلبات معلقة</div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Orders -->
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <div class="flex items-center justify-between p-5 border-b">
+    <h2 class="font-bold text-gray-800">آخر الطلبات</h2>
+    <a href="/admin/orders" class="text-sm text-pink-500 hover:text-pink-700 font-medium">عرض الكل</a>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+        <tr>
+          <th class="px-4 py-3 text-right">رقم الطلب</th>
+          <th class="px-4 py-3 text-right">العميل</th>
+          <th class="px-4 py-3 text-right">المجموع</th>
+          <th class="px-4 py-3 text-right">الحالة</th>
+          <th class="px-4 py-3 text-right">التاريخ</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        <% recentOrders.forEach(order => { %>
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-4 py-3 font-medium">
+            <a href="/admin/orders/<%= order._id %>" class="text-pink-500 hover:underline font-semibold"><%= order.orderNumber %></a>
+          </td>
+          <td class="px-4 py-3"><%= order.customer.name %></td>
+          <td class="px-4 py-3 font-semibold"><%= order.total.toLocaleString('ar-IQ') %> د.ع</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded-full text-xs font-medium
+              <%= order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                  order.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
+                  order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                  order.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700' %>">
+              <%= order.status === 'pending' ? 'معلق' :
+                  order.status === 'confirmed' ? 'مؤكد' :
+                  order.status === 'shipped' ? 'تم الشحن' :
+                  order.status === 'delivered' ? 'تم التسليم' : 'ملغي' %>
+            </span>
+          </td>
+          <td class="px-4 py-3 text-gray-400"><%= new Date(order.createdAt).toLocaleDateString('ar-IQ') %></td>
+        </tr>
+        <% }) %>
+        <% if (recentOrders.length === 0) { %>
+        <tr><td colspan="5" class="text-center py-8 text-gray-400">لا توجد طلبات بعد</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/admin-footer') %>

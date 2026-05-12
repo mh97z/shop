@@ -1,0 +1,72 @@
+<%- include('partials/header') %>
+<script>window._currency = '<%= currency %>';</script>
+
+<div class="max-w-lg mx-auto px-4 py-6 min-h-screen" dir="rtl">
+  <h1 class="text-lg font-bold text-gray-900 mb-5">تأكيد الطلب</h1>
+
+  <% if (locals.error) { %>
+    <div class="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 mb-4 text-sm"><%= error %></div>
+  <% } %>
+
+  <!-- ملخص سريع -->
+  <div class="bg-pink-50 border border-pink-100 rounded-2xl p-4 mb-5">
+    <p class="text-sm text-gray-500 mb-1">إجمالي طلبك</p>
+    <p class="text-2xl font-bold text-pink-500"><%= total.toLocaleString('ar-IQ') %> <%= currency %></p>
+    <p class="text-xs text-gray-400 mt-1">الدفع عند الاستلام فقط</p>
+  </div>
+
+  <form action="/checkout" method="POST" class="space-y-4">
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-1.5">الاسم الكامل <span class="text-red-400">*</span></label>
+      <input type="text" name="name" required placeholder="مثال: أحمد محمد"
+        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100">
+    </div>
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-1.5">رقم الهاتف <span class="text-red-400">*</span></label>
+      <input type="tel" name="phone" required placeholder="07xxxxxxxxx" dir="ltr"
+        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100">
+    </div>
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-1.5">المحافظة <span class="text-red-400">*</span></label>
+      <select name="city" required
+        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 bg-white">
+        <option value="">اختر المحافظة</option>
+        <% ['بغداد','البصرة','نينوى','أربيل','النجف','كربلاء','الأنبار','ديالى','واسط','ذي قار','ميسان','المثنى','القادسية','بابل','كركوك','صلاح الدين','السليمانية','دهوك','حلبجة'].forEach(c => { %>
+          <option><%= c %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-1.5">العنوان التفصيلي <span class="text-red-400">*</span></label>
+      <textarea name="address" required rows="2" placeholder="الحي، الشارع، رقم المنزل..."
+        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 resize-none"></textarea>
+    </div>
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-1.5">ملاحظات إضافية</label>
+      <textarea name="notes" rows="2" placeholder="أي تعليمات للتوصيل..."
+        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 resize-none"></textarea>
+    </div>
+
+    <!-- طريقة الدفع -->
+    <div class="bg-green-50 border border-green-200 rounded-2xl px-4 py-3 flex items-center gap-3">
+      <div class="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center flex-none">
+        <i class="fas fa-money-bill-wave text-green-600"></i>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-gray-800">الدفع عند الاستلام</p>
+        <p class="text-xs text-gray-500">ادفع نقداً عند وصول طلبك</p>
+      </div>
+      <i class="fas fa-check-circle text-green-500 mr-auto"></i>
+    </div>
+    <input type="hidden" name="paymentMethod" value="cod">
+
+    <button type="submit"
+      class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 rounded-2xl transition text-base shadow-md">
+      <i class="fas fa-check-circle ml-2"></i>
+      تأكيد الطلب
+    </button>
+  </form>
+</div>
+
+<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-sm px-5 py-2.5 rounded-full shadow-xl z-50 transition-opacity"></div>
+<%- include('partials/footer') %>

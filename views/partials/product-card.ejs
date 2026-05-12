@@ -1,0 +1,67 @@
+<!-- بطاقة المنتج - تصميم Mura -->
+<div class="product-card bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+  <a href="/products/<%= product.slug %>" class="block">
+    <div class="relative aspect-square overflow-hidden bg-gray-50">
+      <img
+        src="<%= product.images[0] || '/img/placeholder.png' %>"
+        alt="<%= product.name %>"
+        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+        loading="lazy"
+        onerror="this.src='/img/placeholder.png'"
+      />
+      <!-- Badges -->
+      <% if (product.tags && product.tags.includes('الاكثر مبيعا')) { %>
+      <span class="badge-tag badge-bestseller">الاكثر مبيعا</span>
+      <% } %>
+      <% if (product.tags && product.tags.includes('منتج مميز')) { %>
+      <span class="badge-tag badge-featured">منتج مميز</span>
+      <% } %>
+      <% if (product.tags && product.tags.includes('جديد')) { %>
+      <span class="badge-tag badge-new">جديد</span>
+      <% } %>
+      <% if (product.tags && product.tags.includes('خصم')) { %>
+      <span class="badge-tag badge-discount">خصم</span>
+      <% } %>
+    </div>
+  </a>
+
+  <div class="p-3 pb-3">
+    <a href="/products/<%= product.slug %>">
+      <p class="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1"><%= product.name %></p>
+    </a>
+
+    <!-- Price + Cart Row -->
+    <div class="flex items-center justify-between mt-2 gap-2">
+      <div>
+        <span class="font-bold text-gray-900 text-sm"><%= product.basePrice.toLocaleString('ar-IQ') %></span>
+        <span class="text-xs text-gray-500 mr-0.5"><%= currency || 'د.ع' %></span>
+      </div>
+
+      <button
+        class="add-to-cart-btn flex-none w-10 h-10 rounded-xl bg-pink-500 hover:bg-pink-600 text-white flex items-center justify-center shadow transition-colors"
+        data-id="<%= product._id %>"
+        data-name="<%= product.name %>"
+        aria-label="أضف للسلة">
+        <i class="fas fa-cart-plus text-base"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+    <div class="relative aspect-square overflow-hidden bg-gray-50">
+      <img src="<%= product.images[0] || '/img/placeholder.png' %>" alt="<%= product.name %>"
+           class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+           loading="lazy" onerror="this.src='/img/placeholder.png'" />
+      <% if (product.tags && product.tags.includes('نوادر')) { %>
+      <span class="absolute top-2 right-2 bg-amber-600 text-white text-xs px-2 py-0.5 rounded-full">نادر</span>
+      <% } %>
+      <% if (product.tags && product.tags.includes('جديد')) { %>
+      <span class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">جديد</span>
+      <% } %>
+    </div>
+    <div class="p-3">
+      <p class="font-semibold text-gray-800 text-sm line-clamp-2 group-hover:text-amber-700 transition-colors leading-relaxed"><%= product.name %></p>
+      <p class="text-amber-700 font-bold mt-1"><%= product.basePrice.toLocaleString('ar-IQ') %> <span class="text-xs font-normal">د.ع</span></p>
+    </div>
+  </div>
+</a>

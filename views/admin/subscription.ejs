@@ -1,0 +1,101 @@
+<%- include('../partials/admin-header') %>
+
+<!-- ─── الاشتراك ──────────────────────────────────────────────────────────── -->
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">إدارة الاشتراك</h1>
+
+  <!-- الباقة الحالية -->
+  <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+    <h2 class="text-base font-bold text-gray-700 mb-4 flex items-center gap-2">
+      <i class="fas fa-crown text-yellow-500"></i> باقتك الحالية
+    </h2>
+    <div class="flex flex-wrap gap-4 items-start">
+      <div>
+        <% if (tenant.plan) { %>
+        <span class="text-2xl font-black text-indigo-600"><%= tenant.plan.nameAr %></span>
+        <p class="text-sm text-gray-500 mt-1">
+          المنتجات: <strong class="text-gray-800">
+            <%= productCount %> / <%= tenant.plan.productLimit === -1 ? 'غير محدود' : tenant.plan.productLimit %>
+          </strong>
+        </p>
+        <% if (tenant.planExpiry) { %>
+        <p class="text-sm text-gray-500 mt-0.5">
+          تنتهي في: <strong class="<%= new Date() > new Date(tenant.planExpiry) ? 'text-red-600' : 'text-gray-800' %>">
+            <%= new Date(tenant.planExpiry).toLocaleDateString('ar-IQ') %>
+          </strong>
+          <% if (new Date() > new Date(tenant.planExpiry)) { %>
+          <span class="mr-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">منتهي</span>
+          <% } %>
+        </p>
+        <% } %>
+        <% } else { %>
+        <span class="text-lg font-bold text-gray-500">بدون باقة</span>
+        <p class="text-sm text-gray-400 mt-1">تواصل مع الإدارة لتفعيل اشتراكك</p>
+        <% } %>
+      </div>
+
+      <% if (tenant.plan && tenant.plan.productLimit !== -1) { %>
+      <div class="flex-1 min-w-48">
+        <div class="flex justify-between text-xs text-gray-500 mb-1">
+          <span>استخدام المنتجات</span>
+          <span><%= productCount %>/<%= tenant.plan.productLimit %></span>
+        </div>
+        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div class="h-full rounded-full transition-all"
+               style="width: <%= Math.min(100, (productCount / tenant.plan.productLimit) * 100) %>%;
+                      background: <%= (productCount / tenant.plan.productLimit) > 0.9 ? '#ef4444' : '#6366f1' %>">
+          </div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- مقارنة الباقات -->
+  <h2 class="text-base font-bold text-gray-700 mb-4">الباقات المتاحة - الترقية</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <% plans.forEach(plan => { %>
+    <div class="relative bg-white rounded-2xl p-5 shadow-sm border-2
+                <%= tenant.plan && tenant.plan._id.toString() === plan._id.toString() ? 'border-indigo-500' : 'border-gray-100' %>">
+      <% if (tenant.plan && tenant.plan._id.toString() === plan._id.toString()) { %>
+      <span class="absolute -top-3 right-4 text-xs bg-indigo-600 text-white px-3 py-0.5 rounded-full">باقتك الحالية</span>
+      <% } else if (plan.popular) { %>
+      <span class="absolute -top-3 right-4 text-xs bg-green-500 text-white px-3 py-0.5 rounded-full">موصى به</span>
+      <% } %>
+
+      <h3 class="text-lg font-bold text-gray-800"><%= plan.nameAr %></h3>
+      <p class="text-2xl font-black mt-1" style="color: <%= plan.color %>">
+        $<%= plan.price %><span class="text-xs font-normal text-gray-400">/شهر</span>
+      </p>
+
+      <ul class="mt-3 space-y-1.5 text-sm">
+        <li class="flex items-center gap-2 text-gray-600">
+          <i class="fas fa-box text-xs" style="color:<%= plan.color %>"></i>
+          <%= plan.productLimit === -1 ? 'منتجات غير محدودة' : `حتى ${plan.productLimit} منتج` %>
+        </li>
+        <% if (plan.customDomain) { %>
+        <li class="flex items-center gap-2 text-gray-600">
+          <i class="fas fa-globe text-xs" style="color:<%= plan.color %>"></i> دومين مخصص
+        </li>
+        <% } %>
+        <% (plan.features || []).forEach(f => { %>
+        <li class="flex items-start gap-2 text-gray-600">
+          <i class="fas fa-check text-green-500 text-xs mt-1 flex-none"></i> <%= f %>
+        </li>
+        <% }) %>
+      </ul>
+    </div>
+    <% }) %>
+  </div>
+
+  <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-700">
+    <i class="fas fa-info-circle me-2"></i>
+    لترقية اشتراكك، تواصل مع الإدارة عبر
+    <% if (whatsapp) { %>
+    <a href="https://wa.me/<%= whatsapp %>" target="_blank" rel="noopener" class="font-semibold hover:underline">واتساب</a> أو
+    <% } %>
+    البريد الإلكتروني.
+  </div>
+</div>
+
+<%- include('../partials/admin-footer') %>

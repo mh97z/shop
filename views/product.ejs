@@ -1,0 +1,358 @@
+<%- include('partials/header') %>
+<script>window._currency = '<%= currency %>';</script>
+
+<div class="max-w-lg mx-auto px-0 pb-24 min-h-screen" dir="rtl">
+
+  <!-- صورة رئيسية -->
+  <div class="relative w-full aspect-square bg-gray-50 overflow-hidden" id="mainImgWrap">
+    <img id="mainImg"
+         src="<%= product.images[0] || '/img/placeholder.png' %>"
+         alt="<%= product.name %>"
+         loading="lazy"
+         onerror="this.src='/img/placeholder.png'"
+         class="w-full h-full object-cover">
+    <!-- شارة -->
+    <% if (product.isNew) { %><span class="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">جديد</span><% } %>
+    <% if (product.isFeatured) { %><span class="absolute top-3 right-3 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">مميز</span><% } %>
+    <% if (product.isBestSeller) { %><span class="absolute top-3 right-3 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">الأكثر مبيعاً</span><% } %>
+    <% if (product.discount > 0) { %><span class="absolute top-3 left-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full"><%= product.discount %>% خصم</span><% } %>
+  </div>
+
+  <!-- صور مصغرة -->
+  <% if (product.images.length > 1) { %>
+  <div class="flex gap-2 px-4 mt-3 overflow-x-auto pb-1">
+    <% product.images.forEach((img, i) => { %>
+    <button onclick="changeImage('<%= img %>', this)"
+      class="thumb-btn flex-none w-16 h-16 rounded-xl overflow-hidden border-2 transition-all <%= i===0 ? 'border-pink-500' : 'border-gray-100' %>">
+      <img src="<%= img %>" alt="" loading="lazy" onerror="this.src='/img/placeholder.png'" class="w-full h-full object-cover">
+    </button>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <!-- معلومات المنتج -->
+  <div class="px-4 pt-4">
+    <% if (product.category) { %>
+    <a href="/products?cat=<%= product.category._id %>" class="text-xs text-pink-500 font-medium bg-pink-50 px-3 py-1 rounded-full inline-block mb-2">
+      <%= product.category.name %>
+    </a>
+    <% } %>
+
+    <h1 class="text-lg font-bold text-gray-900 leading-snug mb-2"><%= product.name %></h1>
+
+    <div class="flex items-baseline gap-2 mb-4">
+      <span class="text-2xl font-extrabold text-pink-500" id="displayPrice">
+        <%= product.basePrice.toLocaleString('ar-IQ') %>
+      </span>
+      <span class="text-sm text-gray-400"><%= currency %></span>
+    </div>
+
+    <!-- اختيار الحجم -->
+    <% if (product.sizes && product.sizes.length > 0) { %>
+    <div class="mb-4">
+      <p class="text-sm font-semibold text-gray-700 mb-2">اختر الحجم</p>
+      <div class="flex flex-wrap gap-2" id="sizeSelector">
+        <% product.sizes.forEach((s, i) => { %>
+        <button onclick="selectSize(this, '<%= s.label %>', <%= s.price %>)"
+          class="size-btn px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all
+                 <%= i===0 ? 'border-pink-500 bg-pink-50 text-pink-600' : 'border-gray-200 text-gray-600 hover:border-pink-300' %>">
+          <%= s.label %>
+          <span class="text-xs block text-gray-400"><%= s.price.toLocaleString('ar-IQ') %></span>
+        </button>
+        <% }) %>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- الكمية -->
+    <div class="flex items-center justify-between mb-5">
+      <p class="text-sm font-semibold text-gray-700">الكمية</p>
+      <div class="flex items-center gap-4 bg-gray-50 rounded-xl px-4 py-2">
+        <button onclick="changeQty(-1)" class="text-gray-500 hover:text-pink-500 font-bold text-xl w-6 text-center">−</button>
+        <span id="qtyDisplay" class="text-base font-bold text-gray-800 w-6 text-center">1</span>
+        <button onclick="changeQty(1)" class="text-gray-500 hover:text-pink-500 font-bold text-xl w-6 text-center">+</button>
+      </div>
+    </div>
+
+    <!-- وصف المنتج -->
+    <% if (product.description) { %>
+    <div class="bg-gray-50 rounded-2xl p-4 mb-5">
+      <h3 class="text-sm font-bold text-gray-700 mb-2">تفاصيل المنتج</h3>
+      <p class="text-sm text-gray-500 leading-relaxed"><%= product.description %></p>
+    </div>
+    <% } %>
+
+    <!-- منتجات مشابهة -->
+    <% if (similar && similar.length > 0) { %>
+    <div class="mt-2 mb-4">
+      <h2 class="text-base font-bold text-gray-800 mb-3">منتجات مشابهة</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <% similar.forEach(p => { %>
+        <%- include('partials/product-card', { product: p }) %>
+        <% }) %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- شريط الإضافة للسلة السفلي (ثابت) -->
+<div class="fixed bottom-0 right-0 left-0 z-40 bg-white border-t border-gray-100 px-4 py-3 flex gap-3 shadow-lg" dir="rtl">
+  <button onclick="buyNow('<%= product._id %>')"
+    class="flex-none bg-gray-900 hover:bg-gray-700 text-white font-bold px-5 py-3.5 rounded-2xl transition text-sm">
+    اشترِ الآن
+  </button>
+  <button onclick="addToCart('<%= product._id %>')"
+    class="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3.5 rounded-2xl transition flex items-center justify-center gap-2 text-sm shadow">
+    <i class="fas fa-shopping-bag"></i>
+    أضف للسلة
+  </button>
+</div>
+
+<div id="toast" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-sm px-5 py-2.5 rounded-full shadow-xl z-50 transition-opacity"></div>
+
+<script>
+  const productId   = '<%= product._id %>';
+  const basePrice   = <%= product.basePrice %>;
+  const hasSizes    = <%= (product.sizes && product.sizes.length > 0) ? 'true' : 'false' %>;
+  let selectedSize  = hasSizes ? '<%= (product.sizes && product.sizes[0]) ? product.sizes[0].label : "" %>' : '';
+  let selectedPrice = hasSizes && <%= product.sizes ? product.sizes.length : 0 %> > 0
+    ? <%= (product.sizes && product.sizes[0]) ? product.sizes[0].price : 'basePrice' %>
+    : basePrice;
+  let qty = 1;
+
+  function selectSize(el, size, price) {
+    document.querySelectorAll('.size-btn').forEach(b => {
+      b.classList.remove('border-pink-500', 'bg-pink-50', 'text-pink-600');
+      b.classList.add('border-gray-200', 'text-gray-600');
+    });
+    el.classList.add('border-pink-500', 'bg-pink-50', 'text-pink-600');
+    el.classList.remove('border-gray-200', 'text-gray-600');
+    selectedSize  = size;
+    selectedPrice = price;
+    document.getElementById('displayPrice').textContent = price.toLocaleString('ar-IQ');
+  }
+
+  function changeQty(d) {
+    qty = Math.max(1, qty + d);
+    document.getElementById('qtyDisplay').textContent = qty;
+  }
+
+  function changeImage(src, btn) {
+    document.getElementById('mainImg').src = src;
+    document.querySelectorAll('.thumb-btn').forEach(b => b.classList.replace('border-pink-500', 'border-gray-100'));
+    btn.classList.replace('border-gray-100', 'border-pink-500');
+  }
+
+  async function addToCart(id) {
+    const res  = await fetch('/cart/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId: id, size: selectedSize, qty })
+    });
+    const data = await res.json();
+    if (data.success) {
+      updateCartBadge(data.cartCount);
+      showToast('تمت الإضافة للسلة');
+    } else {
+      showToast(data.message || 'حدث خطأ');
+    }
+  }
+
+  async function buyNow(id) {
+    await addToCart(id);
+    window.location.href = '/checkout';
+  }
+</script>
+<%- include('partials/footer') %>
+  <!-- Breadcrumb -->
+  <nav class="text-sm text-gray-400 mb-6 flex items-center gap-2">
+    <a href="/" class="hover:text-amber-700">الرئيسية</a>
+    <i class="fas fa-chevron-left text-xs"></i>
+    <a href="/products" class="hover:text-amber-700">المنتجات</a>
+    <i class="fas fa-chevron-left text-xs"></i>
+    <span class="text-gray-600"><%= product.name %></span>
+  </nav>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-3xl shadow-sm p-6 md:p-8">
+    <!-- Images -->
+    <div>
+      <!-- Main image -->
+      <div class="relative rounded-2xl overflow-hidden bg-gray-50 aspect-square cursor-zoom-in" id="mainImgWrap">
+        <img id="mainImg" src="<%= product.images[0] || '/img/placeholder.png' %>"
+             alt="<%= product.name %>" class="w-full h-full object-cover"
+             onerror="this.src='/img/placeholder.png'" />
+        <button onclick="openLightbox()" class="absolute top-3 left-3 bg-white/80 rounded-full p-2 hover:bg-white shadow-sm">
+          <i class="fas fa-expand text-gray-600 text-sm"></i>
+        </button>
+      </div>
+      <!-- Thumbnails -->
+      <% if (product.images.length > 1) { %>
+      <div class="flex gap-2 mt-3 overflow-x-auto pb-1">
+        <% product.images.forEach((img, i) => { %>
+        <button onclick="changeImage('<%= img %>')"
+          class="flex-none w-16 h-16 rounded-xl overflow-hidden border-2 transition-all hover:border-amber-400 <%= i===0 ? 'border-amber-500' : 'border-transparent' %>">
+          <img src="<%= img %>" alt="" class="w-full h-full object-cover" onerror="this.src='/img/placeholder.png'" />
+        </button>
+        <% }) %>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Product Info -->
+    <div class="flex flex-col gap-4">
+      <div>
+        <% if (product.category) { %>
+        <span class="text-xs text-amber-600 font-medium bg-amber-50 px-3 py-1 rounded-full"><%= product.category.name %></span>
+        <% } %>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mt-2 leading-relaxed"><%= product.name %></h1>
+        <p class="text-3xl font-extrabold text-amber-700 mt-2" id="displayPrice">
+          <%= product.basePrice.toLocaleString('ar-IQ') %> <span class="text-base font-normal text-gray-500">د.ع</span>
+        </p>
+      </div>
+
+      <!-- Size Selector -->
+      <% if (product.sizes && product.sizes.length > 0) { %>
+      <div>
+        <p class="text-sm font-semibold text-gray-700 mb-2">اختر الحجم</p>
+        <div class="flex flex-wrap gap-2" id="sizeSelector">
+          <% product.sizes.forEach((s, i) => { %>
+          <button onclick="selectSize(this, '<%= s.label %>', <%= s.price %>)"
+            class="size-btn px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all
+                   <%= i===0 ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-gray-200 hover:border-amber-300' %>"
+            data-size="<%= s.label %>" data-price="<%= s.price %>">
+            <%= s.label %>
+            <span class="text-xs block text-gray-400"><%= s.price.toLocaleString('ar-IQ') %> د.ع</span>
+          </button>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Quantity -->
+      <div>
+        <p class="text-sm font-semibold text-gray-700 mb-2">الكمية</p>
+        <div class="flex items-center gap-3">
+          <button onclick="changeQty(-1)" class="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center hover:border-amber-400 font-bold text-lg leading-none">−</button>
+          <span id="qtyDisplay" class="text-lg font-bold w-8 text-center">1</span>
+          <button onclick="changeQty(1)" class="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center hover:border-amber-400 font-bold text-lg leading-none">+</button>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex flex-col sm:flex-row gap-3 mt-2">
+        <button onclick="addToCart('<%= product._id %>')"
+          class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-md">
+          <i class="fas fa-shopping-bag"></i> أضف إلى السلة
+        </button>
+        <a href="/cart/checkout" onclick="buyNow('<%= product._id %>', event)"
+          class="flex-1 bg-gray-900 hover:bg-gray-700 text-white font-bold py-3.5 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-md">
+          <i class="fas fa-bolt"></i> اشترِ الآن
+        </a>
+      </div>
+
+      <!-- Toast notification -->
+      <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-xl text-sm z-50 transition-all"></div>
+
+      <!-- Description -->
+      <% if (product.description) { %>
+      <div class="border-t pt-4 mt-2">
+        <h3 class="font-semibold text-gray-700 mb-2">تفاصيل المنتج</h3>
+        <p class="text-sm text-gray-500 leading-relaxed"><%= product.description %></p>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Similar Products -->
+  <% if (similar.length > 0) { %>
+  <div class="mt-12">
+    <h2 class="text-xl font-bold text-gray-800 mb-5">منتجات مشابهة</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <% similar.forEach(p => { %>
+      <%- include('partials/product-card', { product: p }) %>
+      <% }) %>
+    </div>
+  </div>
+  <% } %>
+</section>
+
+<!-- Lightbox -->
+<div id="lightbox" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="" class="max-w-full max-h-full rounded-xl shadow-2xl" />
+  <button class="absolute top-4 right-4 text-white text-2xl hover:text-amber-400" onclick="closeLightbox()">
+    <i class="fas fa-times"></i>
+  </button>
+</div>
+
+<script>
+  const productId  = '<%= product._id %>';
+  const basePrice  = <%= product.basePrice %>;
+  const hasSizes   = <%= product.sizes && product.sizes.length > 0 ? 'true' : 'false' %>;
+  let selectedSize = hasSizes ? '<%= product.sizes[0] ? product.sizes[0].label : "" %>' : '';
+  let selectedPrice = hasSizes && <%= product.sizes.length %> > 0 ? <%= product.sizes[0] ? product.sizes[0].price : product.basePrice %> : basePrice;
+  let qty = 1;
+
+  function selectSize(el, size, price) {
+    document.querySelectorAll('.size-btn').forEach(b => {
+      b.classList.remove('border-amber-500', 'bg-amber-50', 'text-amber-700');
+      b.classList.add('border-gray-200');
+    });
+    el.classList.add('border-amber-500', 'bg-amber-50', 'text-amber-700');
+    el.classList.remove('border-gray-200');
+    selectedSize  = size;
+    selectedPrice = price;
+    document.getElementById('displayPrice').innerHTML = price.toLocaleString('ar-IQ') + ' <span class="text-base font-normal text-gray-500">د.ع</span>';
+  }
+
+  function changeQty(d) {
+    qty = Math.max(1, qty + d);
+    document.getElementById('qtyDisplay').textContent = qty;
+  }
+
+  async function addToCart(id) {
+    const res = await fetch('/cart/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId: id, size: selectedSize, qty })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const badge = document.getElementById('cartBadge');
+      if (badge) { badge.textContent = data.cartCount; badge.classList.remove('hidden'); badge.classList.add('flex'); }
+      showToast('✅ تمت الإضافة إلى السلة');
+    }
+  }
+
+  async function buyNow(id, e) {
+    e.preventDefault();
+    await addToCart(id);
+    window.location.href = '/cart';
+  }
+
+  function changeImage(src) {
+    document.getElementById('mainImg').src = src;
+  }
+
+  function openLightbox() {
+    const lb = document.getElementById('lightbox');
+    document.getElementById('lightboxImg').src = document.getElementById('mainImg').src;
+    lb.classList.remove('hidden');
+    lb.classList.add('flex');
+  }
+
+  function closeLightbox() {
+    const lb = document.getElementById('lightbox');
+    lb.classList.add('hidden');
+    lb.classList.remove('flex');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 2500);
+  }
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,13 @@
+  </main>
+</div>
+
+<script>
+  // Confirm delete
+  document.querySelectorAll('[data-confirm]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      if (!confirm(btn.dataset.confirm)) e.preventDefault();
+    });
+  });
+</script>
+</body>
+</html>

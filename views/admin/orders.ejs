@@ -1,0 +1,67 @@
+<%- include('partials/admin-header') %>
+
+<!-- Filter Tabs -->
+<div class="flex gap-2 mb-5 flex-wrap">
+  <% ['', 'pending', 'confirmed', 'shipped', 'delivered', 'cancelled'].forEach(s => { %>
+  <a href="/admin/orders<%= s ? '?status='+s : '' %>"
+     class="px-4 py-2 rounded-xl text-sm font-medium transition-colors
+            <%= currentStatus === s ? 'bg-amber-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-amber-50 border border-gray-200' %>">
+    <%= s === '' ? 'الكل' : s === 'pending' ? 'معلق' : s === 'confirmed' ? 'مؤكد' : s === 'shipped' ? 'تم الشحن' : s === 'delivered' ? 'مسلّم' : 'ملغي' %>
+  </a>
+  <% }) %>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+        <tr>
+          <th class="px-4 py-3 text-right">رقم الطلب</th>
+          <th class="px-4 py-3 text-right">العميل</th>
+          <th class="px-4 py-3 text-right">الهاتف</th>
+          <th class="px-4 py-3 text-right">المجموع</th>
+          <th class="px-4 py-3 text-right">الحالة</th>
+          <th class="px-4 py-3 text-right">التاريخ</th>
+          <th class="px-4 py-3 text-right"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        <% orders.forEach(order => { %>
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-4 py-3 font-medium text-amber-600">
+            <a href="/admin/orders/<%= order._id %>" class="hover:underline"><%= order.orderNumber %></a>
+          </td>
+          <td class="px-4 py-3"><%= order.customer.name %></td>
+          <td class="px-4 py-3 text-gray-500 dir-ltr"><%= order.customer.phone %></td>
+          <td class="px-4 py-3 font-semibold"><%= order.total.toLocaleString('ar-IQ') %> د.ع</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded-full text-xs font-medium
+              <%= order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                  order.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
+                  order.status === 'shipped' ? 'bg-purple-100 text-purple-700' :
+                  order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                  'bg-red-100 text-red-700' %>">
+              <%= order.status === 'pending' ? 'معلق' :
+                  order.status === 'confirmed' ? 'مؤكد' :
+                  order.status === 'shipped' ? 'تم الشحن' :
+                  order.status === 'delivered' ? 'مسلّم' : 'ملغي' %>
+            </span>
+          </td>
+          <td class="px-4 py-3 text-gray-400 text-xs"><%= new Date(order.createdAt).toLocaleDateString('ar-IQ') %></td>
+          <td class="px-4 py-3">
+            <a href="/admin/orders/<%= order._id %>" class="text-blue-500 hover:text-blue-700 text-xs hover:underline">عرض</a>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (orders.length === 0) { %>
+        <tr><td colspan="7" class="text-center py-12 text-gray-400">
+          <i class="fas fa-inbox text-4xl block mb-3"></i>
+          لا توجد طلبات
+        </td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/admin-footer') %>

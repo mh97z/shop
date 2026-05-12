@@ -1,0 +1,123 @@
+<%- include('partials/admin-header') %>
+
+<div class="max-w-xl">
+  <% if (locals.error) { %>
+  <div class="bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-5 border border-red-100 text-sm"><%= error %></div>
+  <% } %>
+
+  <!-- Add Category Form -->
+  <div class="bg-white rounded-2xl shadow-sm p-5 mb-6">
+    <h3 class="font-semibold text-gray-800 mb-4">إضافة فئة جديدة</h3>
+    <form method="POST" action="/admin/categories" enctype="multipart/form-data" class="space-y-3">
+      <div class="flex gap-3">
+        <input type="text" name="name" required placeholder="اسم الفئة مثل: نوادر"
+               class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-pink-400 text-sm" />
+        <input type="number" name="order" placeholder="الترتيب" value="0" min="0"
+               class="w-24 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-pink-400 text-sm" />
+      </div>
+      <div class="flex items-center gap-3">
+        <label class="text-sm text-gray-600 flex-none">صورة الفئة (اختياري)</label>
+        <input type="file" name="image" accept="image/*"
+               class="text-sm text-gray-500 file:mr-3 file:text-xs file:bg-pink-50 file:text-pink-600 file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:cursor-pointer" />
+      </div>
+      <button type="submit" class="bg-pink-500 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-pink-600 transition w-full">
+        <i class="fas fa-plus ml-1"></i> إضافة الفئة
+      </button>
+    </form>
+  </div>
+
+  <!-- Categories List -->
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-gray-500 text-xs">
+        <tr>
+          <th class="px-4 py-3 text-right">الصورة</th>
+          <th class="px-4 py-3 text-right">الاسم</th>
+          <th class="px-4 py-3 text-right">الترتيب</th>
+          <th class="px-4 py-3 text-right">حذف</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        <% categories.forEach(cat => { %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3">
+            <% if (cat.image) { %>
+              <img src="<%= cat.image %>" alt="<%= cat.name %>" class="w-10 h-10 rounded-full object-cover border border-pink-100">
+            <% } else { %>
+              <div class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center">
+                <i class="fas fa-tag text-pink-300 text-xs"></i>
+              </div>
+            <% } %>
+          </td>
+          <td class="px-4 py-3 font-semibold text-gray-700"><%= cat.name %></td>
+          <td class="px-4 py-3 text-gray-400"><%= cat.order %></td>
+          <td class="px-4 py-3">
+            <form method="POST" action="/admin/categories/<%= cat._id %>?_method=DELETE">
+              <button type="submit" data-confirm="حذف هذه الفئة؟"
+                      class="text-red-400 hover:text-red-600 text-xs flex items-center gap-1">
+                <i class="fas fa-trash-alt"></i> حذف
+              </button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (categories.length === 0) { %>
+        <tr><td colspan="4" class="text-center py-8 text-gray-400">لا توجد فئات بعد</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/admin-footer') %>
+  <div class="bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-5 border border-red-100 text-sm"><%= error %></div>
+  <% } %>
+
+  <!-- Add Category Form -->
+  <div class="bg-white rounded-2xl shadow-sm p-5 mb-6">
+    <h3 class="font-semibold text-gray-800 mb-4">إضافة فئة جديدة</h3>
+    <form method="POST" action="/admin/categories" class="flex gap-3">
+      <input type="text" name="name" required placeholder="اسم الفئة مثل: نوادر"
+             class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-amber-400 text-sm" />
+      <input type="number" name="order" placeholder="الترتيب" value="0" min="0"
+             class="w-24 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-amber-400 text-sm" />
+      <button type="submit" class="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 transition-colors">
+        <i class="fas fa-plus"></i> إضافة
+      </button>
+    </form>
+  </div>
+
+  <!-- Categories List -->
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+        <tr>
+          <th class="px-4 py-3 text-right">الاسم</th>
+          <th class="px-4 py-3 text-right">الترتيب</th>
+          <th class="px-4 py-3 text-right">الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        <% categories.forEach(cat => { %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 font-medium"><%= cat.name %></td>
+          <td class="px-4 py-3 text-gray-400"><%= cat.order %></td>
+          <td class="px-4 py-3">
+            <form method="POST" action="/admin/categories/<%= cat._id %>?_method=DELETE">
+              <button type="submit" data-confirm="حذف هذه الفئة؟"
+                      class="text-red-400 hover:text-red-600 text-xs flex items-center gap-1">
+                <i class="fas fa-trash-alt"></i> حذف
+              </button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (categories.length === 0) { %>
+        <tr><td colspan="3" class="text-center py-8 text-gray-400">لا توجد فئات</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/admin-footer') %>

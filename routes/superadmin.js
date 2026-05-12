@@ -20,7 +20,18 @@ router.post('/login', (req, res) => {
   const { username, password } = req.body;
   if (username === process.env.SUPER_ADMIN_USER && password === process.env.SUPER_ADMIN_PASS) {
     req.session.isSuperAdmin = true;
-    return res.redirect('/superadmin');
+    return req.session.save((err) => {
+      if (err) {
+        return res.render('superadmin/login', {
+          title: 'إدارة المنصة',
+          error: 'تعذر حفظ الجلسة، حاول مرة أخرى',
+          storeName: 'Platform Admin',
+          isAdmin: false,
+          cartCount: 0
+        });
+      }
+      return res.redirect('/superadmin');
+    });
   }
   res.render('superadmin/login', { title: 'إدارة المنصة', error: 'بيانات غير صحيحة', storeName: 'Platform Admin', isAdmin: false, cartCount: 0 });
 });

@@ -53,7 +53,12 @@ router.post('/login', (req, res) => {
   if (username === tenant.adminUsername && password === tenant.adminPassword) {
     req.session.isAdmin   = true;
     req.session.tenantId  = tenant._id.toString();
-    return res.redirect('/admin');
+    return req.session.save((err) => {
+      if (err) {
+        return res.render('admin/login', { title: 'تسجيل الدخول', error: 'تعذر حفظ الجلسة، حاول مرة أخرى' });
+      }
+      return res.redirect('/admin');
+    });
   }
   res.render('admin/login', { title: 'تسجيل الدخول', error: 'اسم المستخدم أو كلمة المرور خاطئة' });
 });

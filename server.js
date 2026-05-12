@@ -45,12 +45,11 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // ─── إعدادات Express ────────────────────────────────────────────────────────
+
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
-  }
-}));
 
 // ─── محرك القوالب ──────────────────────────────────────────────────────────
 app.set('view engine', 'ejs');

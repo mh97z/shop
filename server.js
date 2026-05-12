@@ -12,6 +12,9 @@ const path           = require('path');
 const resolveTenant  = require('./middleware/tenant');
 
 const app = express();
+const useSecureCookies = process.env.SESSION_COOKIE_SECURE === 'true';
+
+app.set('trust proxy', 1);
 
 // ─── الاتصال بقاعدة البيانات ───────────────────────────────────────────────
 mongoose.connect(process.env.MONGODB_URI)
@@ -62,8 +65,9 @@ app.use(session({
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
   cookie: {
-    secure:   process.env.NODE_ENV === 'production',
+    secure:   useSecureCookies,
     httpOnly: true,
+    sameSite: 'lax',
     maxAge:   7 * 24 * 60 * 60 * 1000
   }
 }));

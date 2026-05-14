@@ -12,16 +12,20 @@ const { requireSuperAdmin } = require('../middleware/auth');
 
 // ─── تسجيل الدخول ────────────────────────────────────────────────────────
 router.get('/login', (req, res) => {
+  console.log('🔍 GET /superadmin/login - Session:', req.session);
   if (req.session.isSuperAdmin) return res.redirect('/superadmin');
   res.render('superadmin/login', { title: 'إدارة المنصة', error: null, storeName: 'Platform Admin', isAdmin: false, cartCount: 0 });
 });
 
 router.post('/login', (req, res) => {
+  console.log('🔍 POST /superadmin/login - Body:', req.body);
   const { username, password } = req.body;
   if (username === process.env.SUPER_ADMIN_USER && password === process.env.SUPER_ADMIN_PASS) {
+    console.log('✅ كلمات مرور صحيحة - حفظ الجلسة');
     req.session.isSuperAdmin = true;
     return req.session.save((err) => {
       if (err) {
+        console.log('❌ خطأ في حفظ الجلسة:', err);
         return res.render('superadmin/login', {
           title: 'إدارة المنصة',
           error: 'تعذر حفظ الجلسة، حاول مرة أخرى',
@@ -30,9 +34,11 @@ router.post('/login', (req, res) => {
           cartCount: 0
         });
       }
+      console.log('✅ تم حفظ الجلسة - إعادة توجيه إلى /superadmin');
       return res.redirect('/superadmin');
     });
   }
+  console.log('❌ كلمات مرور غير صحيحة');
   res.render('superadmin/login', { title: 'إدارة المنصة', error: 'بيانات غير صحيحة', storeName: 'Platform Admin', isAdmin: false, cartCount: 0 });
 });
 

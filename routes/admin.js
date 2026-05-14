@@ -43,23 +43,29 @@ async function processImage(buffer, filename) {
 
 // ─── تسجيل الدخول ────────────────────────────────────────────────────────
 router.get('/login', (req, res) => {
+  console.log('🔍 GET /admin/login - Session:', req.session);
   if (req.session.isAdmin) return res.redirect('/admin');
   res.render('admin/login', { title: 'تسجيل الدخول', error: null });
 });
 
 router.post('/login', (req, res) => {
+  console.log('🔍 POST /admin/login - Body:', req.body);
   const { username, password } = req.body;
   const tenant = req.tenant;
   if (username === tenant.adminUsername && password === tenant.adminPassword) {
+    console.log('✅ كلمات مرور صحيحة - حفظ الجلسة');
     req.session.isAdmin   = true;
     req.session.tenantId  = tenant._id.toString();
     return req.session.save((err) => {
       if (err) {
+        console.log('❌ خطأ في حفظ الجلسة:', err);
         return res.render('admin/login', { title: 'تسجيل الدخول', error: 'تعذر حفظ الجلسة، حاول مرة أخرى' });
       }
+      console.log('✅ تم حفظ الجلسة - إعادة توجيه إلى /admin');
       return res.redirect('/admin');
     });
   }
+  console.log('❌ كلمات مرور غير صحيحة');
   res.render('admin/login', { title: 'تسجيل الدخول', error: 'اسم المستخدم أو كلمة المرور خاطئة' });
 });
 
